@@ -13,6 +13,7 @@
 		649E29AD23ED0A5300CFB4EB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 649E29AB23ED0A5300CFB4EB /* Main.storyboard */; };
 		649E29AF23ED0A5C00CFB4EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 649E29AE23ED0A5C00CFB4EB /* Assets.xcassets */; };
 		649E29B223ED0A5C00CFB4EB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 649E29B023ED0A5C00CFB4EB /* LaunchScreen.storyboard */; };
+		649E29BA23ED0B1200CFB4EB /* LinkableUITextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649E29B923ED0B1200CFB4EB /* LinkableUITextView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		649E29AE23ED0A5C00CFB4EB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		649E29B123ED0A5C00CFB4EB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		649E29B323ED0A5C00CFB4EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		649E29B923ED0B1200CFB4EB /* LinkableUITextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkableUITextView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				649E29AE23ED0A5C00CFB4EB /* Assets.xcassets */,
 				649E29B023ED0A5C00CFB4EB /* LaunchScreen.storyboard */,
 				649E29B323ED0A5C00CFB4EB /* Info.plist */,
+				649E29B923ED0B1200CFB4EB /* LinkableUITextView.swift */,
 			);
 			path = HyperlinkLab;
 			sourceTree = "<group>";
@@ -141,6 +144,7 @@
 				649E29AA23ED0A5300CFB4EB /* ViewController.swift in Sources */,
 				649E29A623ED0A5300CFB4EB /* AppDelegate.swift in Sources */,
 				649E29A823ED0A5300CFB4EB /* SceneDelegate.swift in Sources */,
+				649E29BA23ED0B1200CFB4EB /* LinkableUITextView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,7 +220,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -270,7 +274,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
