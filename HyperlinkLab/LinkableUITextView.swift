@@ -8,7 +8,17 @@
 
 import UIKit
 
+class TextLink {
+    var text = ""
+    var url = ""
+    var range = NSRange( location:0, length:0 )
+    var activeHyperlinkAttributes:[ NSAttributedString.Key:Any ] = [:]
+    var inactiveHyperlinkAttributes:[ NSAttributedString.Key:Any ] = [:]
+}
+
 @IBDesignable class LinkableUITextView: UITextView {
+    var linkStore:[TextLink] = []
+    var attributedString = NSMutableAttributedString( string:"", attributes:nil )
     
     @IBInspectable var linkableText:String = "Click <a href='https://www.google.com'>here</a> to go to link to Google." {
         didSet {
@@ -30,44 +40,107 @@ import UIKit
             makeLink()
         }
     }
-
     
+    @IBInspectable var enabled:Bool = true {
+        didSet {
+            for textLink in linkStore {
+                if enabled {
+                    attributedString.setAttributes( activeHyperlinkAttributes, range:textLink.range )
+                    attributedString.addAttribute( .link, value:textLink.url, range:textLink.range )
+                } else {
+                    attributedString.setAttributes( inactiveHyperlinkAttributes, range:textLink.range )
+                }
+            }
+            text = ""
+            attributedText = attributedString
+            print( "### \(linkableText) ###" )
+        }
+    }
+
+    var baseAttributes:[ NSAttributedString.Key:Any ]
+    var activeHyperlinkAttributes:[ NSAttributedString.Key:Any ]
+    var inactiveHyperlinkAttributes:[ NSAttributedString.Key:Any ]
+
     override func prepareForInterfaceBuilder() {
         textFont = UIFont( name:fontName, size:fontSize ) ?? UIFont.systemFont(ofSize: fontSize)
+        
+        baseAttributes = [
+            .font:textFont as Any
+        ]
+        
+        activeHyperlinkAttributes = [
+            .font:textFont as Any,
+            .foregroundColor:UIColor(named:"activeHyperlink") as Any,
+            .underlineStyle:1
+        ]
+        
+        inactiveHyperlinkAttributes = [
+            .font:textFont as Any,
+            .foregroundColor:UIColor(named:"inactiveHyperlink") as Any,
+            .underlineStyle:1
+        ]
+
         makeLink()
     }
     
     
     override init( frame: CGRect, textContainer: NSTextContainer? ) {
+        baseAttributes = [:]
+        activeHyperlinkAttributes = [:]
+        inactiveHyperlinkAttributes = [:]
+
         super.init( frame:frame, textContainer:textContainer )
 
         makeLink()
     }
     
     required init?( coder:NSCoder ) {
+        baseAttributes = [:]
+        activeHyperlinkAttributes = [:]
+        inactiveHyperlinkAttributes = [:]
+
         super.init( coder:coder )
-        
+ 
         makeLink()
     }
 
+    
     func makeLink() {
-        attributedText = parseHyperlink( linkableText )
+        var source  = linkableText
+        let value = UIApplication.openSettingsURLString
+        source = source.replacingOccurrences( of:"UIApplication.openSettingsURLString", with:value )
+
+        linkStore.removeAll()
+        
+        attributedText = parseHyperlink( source )
+        
+        print( "linkStore = \(linkStore)" )
+        
+        for textLink in linkStore {
+            print( attributedText.attributedSubstring( from:textLink.range ))
+        }
+        
     }
     
     
     func parseHyperlink( _ string:String ) -> NSAttributedString {
-
-        let baseAttributes:[ NSAttributedString.Key: Any ] = [
+        baseAttributes = [
             .font:textFont as Any
         ]
         
-        let hyperlinkAttributes:[NSAttributedString.Key : Any ] = [
+        activeHyperlinkAttributes = [
             .font:textFont as Any,
-            .underlineStyle:1,
+            .foregroundColor:UIColor(named:"activeHyperlink") as Any,
+            .underlineStyle:1
         ]
         
-        let errorStringReturn = NSAttributedString( string:string, attributes:baseAttributes )
+        inactiveHyperlinkAttributes = [
+            .font:textFont as Any,
+            .foregroundColor:UIColor(named:"inactiveHyperlink") as Any,
+            .underlineStyle:1
+        ]
 
+        let errorStringReturn = NSAttributedString( string:string, attributes:baseAttributes )
 
         var position = string.startIndex
         var startText:Int = 0
@@ -76,9 +149,9 @@ import UIKit
         var endURL:Int = 0
         var firstPart:String = ""
         var secondPart:String = ""
-        var lastPart:String = ""
         var urlPart:String = ""
-        let attributedString = NSMutableAttributedString( string:"", attributes:baseAttributes )
+        
+        attributedString = NSMutableAttributedString( string:"", attributes:baseAttributes )
         
         var done = false
 
@@ -90,116 +163,113 @@ import UIKit
                 firstPart = String( string[position..<range.lowerBound] )
                 
                 guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
-                     return NSAttributedString( string:"1", attributes:baseAttributes )
-                     return errorStringReturn
+                      return errorStringReturn
                 }
                 position = string.index( after:after )
-                print(" position = \(position)")
             } else {
                 firstPart = String( string[position..<string.endIndex] )
                 done = true
             }
             
-            occurance = "href='"
-            if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
-                startURL = string.distance( from:string.startIndex, to:range.upperBound )
-                let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
-                
-                guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
-                        return NSAttributedString( string:"2", attributes:baseAttributes )
+            if( !done ) {
+                // TODO: Make Delimiter tolerant of single and double quotes
+                occurance = "href='"
+                if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
+                    startURL = string.distance( from:string.startIndex, to:range.upperBound )
+                    let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
+                    
+                    guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
+                            return errorStringReturn
+                        }
+                    position = string.index( after:after )
+                } else {
+                    done = true
+                }
+            }
+
+            if( !done ) {
+                // TODO: Make Delimiter tolerant of single and double quotes
+                occurance = "'"
+                if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
+                    endURL = string.distance( from:string.startIndex, to:range.lowerBound ) - 1
+                    let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
+
+                    urlPart = String( string[ string.index(string.startIndex, offsetBy:startURL )...string.index(string.startIndex, offsetBy:endURL ) ] )
+                    
+                    guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
                         return errorStringReturn
                     }
-                position = string.index( after:after )
-                print(" position = \(position)")
-            } else {
-                done = true
-            }
-            
-            occurance = "'"
-            if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
-                endURL = string.distance( from:string.startIndex, to:range.lowerBound ) - 1
-                let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
-
-                urlPart = String( string[ string.index(string.startIndex, offsetBy:startURL )...string.index(string.startIndex, offsetBy:endURL ) ] )
-                
-                guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
-                    return NSAttributedString( string:"3", attributes:baseAttributes )
-                    return errorStringReturn
+                    position = string.index( after:after )
+                } else {
+                    done = true
                 }
-                position = string.index( after:after )
-                print(" position = \(position)")
-            } else {
-                done = true
             }
-            
-            occurance = ">"
-            if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
-                startText = string.distance( from:string.startIndex, to:range.lowerBound ) + 1
-                let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
-                
-                guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
-                    return NSAttributedString( string:"4", attributes:baseAttributes )
-                    return errorStringReturn
+
+            if( !done ) {
+                occurance = ">"
+                if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
+                    startText = string.distance( from:string.startIndex, to:range.lowerBound ) + 1
+                    let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
+                    
+                    guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
+                        return errorStringReturn
+                    }
+                    position = string.index( after:after )
+                } else {
+                    done = true
                 }
-                position = string.index( after:after )
-                print(" position = \(position)")
-            }else {
-                done = true
             }
 
-            
-            occurance = "</a>"
-            if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
-                let start = string.distance( from:string.startIndex, to:range.lowerBound )
-                endText = start - 1
-                let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
+            if( !done ) {
+                occurance = "</a>"
+                if let range = string.range( of:occurance, options: .caseInsensitive, range:position..<string.endIndex ) {
+                    let start = string.distance( from:string.startIndex, to:range.lowerBound )
+                    endText = start - 1
+                    let offset = occurance.distance( from:occurance.startIndex, to:occurance.endIndex ) - 1
 
-                guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
-                     return NSAttributedString( string:"5", attributes:baseAttributes )
-                     return errorStringReturn
+                    guard let after = string.index( range.lowerBound, offsetBy:offset, limitedBy:string.endIndex ) else {
+                         return errorStringReturn
+                    }
+                    position = string.index( after:after )
+     
+                    secondPart = String( string[ string.index(string.startIndex, offsetBy:startText )...string.index(string.startIndex, offsetBy:endText ) ] )
+
+                } else {
+                    done = true
                 }
-                position = string.index( after:after )
-                print(" position = \(position)")
-
-                secondPart = String( string[ string.index(string.startIndex, offsetBy:startText )...string.index(string.startIndex, offsetBy:endText ) ] )
-
-            } else {
-                done = true
             }
 
-            print(" string.startIndex = \(string.startIndex)")
-            print(" string.endIndex = \(string.endIndex)")
-            print( "[" + firstPart + secondPart + lastPart + "]" )
-            print( "{" + urlPart + "}"  )
-//            done = ( position >= string.endIndex )
-            
+            print( "urlPart = \(urlPart)")
             attributedString.append( NSAttributedString( string:firstPart, attributes:baseAttributes ) )
+        
+            var linkPart = NSMutableAttributedString( string:secondPart, attributes:activeHyperlinkAttributes )
+            if enabled {
+                linkPart.addAttribute( .link, value:urlPart, range:NSRange( location:0, length:secondPart.count ) )
+            } else {
+                linkPart = NSMutableAttributedString( string:secondPart, attributes:inactiveHyperlinkAttributes )
+            }
             
-            let linkPart = NSMutableAttributedString( string:secondPart, attributes:hyperlinkAttributes )
-            linkPart.addAttribute( .link, value:urlPart, range:NSRange(location:0, length:secondPart.count ) )
+
+            if(( secondPart != "" ) && (urlPart != "" )) {
+                let range = NSRange( location:attributedString.string.count, length:secondPart.count )
+                let textLink = TextLink()
+                textLink.text  = secondPart
+                textLink.url   = urlPart
+                textLink.range = range
+                textLink.activeHyperlinkAttributes = activeHyperlinkAttributes
+                textLink.inactiveHyperlinkAttributes = inactiveHyperlinkAttributes
+                linkStore.append( textLink)
+            }
             
             attributedString.append( linkPart )
-            attributedString.append( NSAttributedString( string:lastPart, attributes:baseAttributes ))
             
             firstPart = ""
             secondPart = ""
-            lastPart = ""
             urlPart = ""
         }
         
         let returnString:NSAttributedString = attributedString
         return returnString
-        
     }
 
-}
-
-extension LinkableUITextView:UITextViewDelegate {
-    func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-        return false
-    }
-
-    func textView(_ textView:UITextView, shouldInteractWith URL:URL, in characterRange:NSRange, interaction:UITextItemInteraction ) -> Bool {
-        return true
-    }
 }

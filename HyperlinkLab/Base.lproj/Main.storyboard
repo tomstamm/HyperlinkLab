@@ -15,8 +15,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TXe-1K-1wb" customClass="LinkableUITextView" customModule="HyperlinkLab" customModuleProvider="target">
-                                <rect key="frame" x="20" y="64" width="374" height="778"/>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lxb-Du-ogS">
+                                <rect key="frame" x="182.5" y="682" width="51" height="31"/>
+                                <connections>
+                                    <action selector="enableSwitchChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="MLC-ly-TYs"/>
+                                </connections>
+                            </switch>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TXe-1K-1wb" customClass="LinkableUITextView" customModule="HyperlinkLab" customModuleProvider="target">
+                                <rect key="frame" x="20" y="131" width="374" height="598"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="14"/>
@@ -26,20 +32,30 @@
                                         <real key="value" value="24"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="string" keyPath="fontName" value="Helvetica Neue"/>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="linkableText" value="Click &lt;a href='https://www.unionbank.com'&gt;here&lt;/a&gt; to go to link to Union Bank"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="linkableText">
+                                        <string key="value">Click &lt;a href='https://www.unionbank.com'&gt;here&lt;/a&gt; to go to Union Bank
+
+Click &lt;a href='UIApplication.openSettingsURLString'&gt;here&lt;/a&gt; to deep-link to the Settings App.
+
+&lt;a href='https://www.google.com'&gt;Google&lt;/a&gt;</string>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="enabled" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </textView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="lxb-Du-ogS" firstAttribute="top" secondItem="TXe-1K-1wb" secondAttribute="bottom" constant="20" id="5b7-L7-tyP"/>
                             <constraint firstItem="TXe-1K-1wb" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="6hv-eJ-sw2"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="TXe-1K-1wb" secondAttribute="bottom" constant="20" id="8B3-Uv-V98"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="TXe-1K-1wb" secondAttribute="bottom" constant="200" id="8B3-Uv-V98"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="TXe-1K-1wb" secondAttribute="trailing" constant="20" id="I8x-RZ-crg"/>
                             <constraint firstItem="TXe-1K-1wb" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="baV-d7-iDo"/>
+                            <constraint firstItem="lxb-Du-ogS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="yio-3Y-uoq"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
+                        <outlet property="enabledSwitch" destination="lxb-Du-ogS" id="AVI-hx-atP"/>
                         <outlet property="linkableText" destination="TXe-1K-1wb" id="J76-Jr-0BW"/>
                     </connections>
                 </viewController>

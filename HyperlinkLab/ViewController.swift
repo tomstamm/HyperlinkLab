@@ -11,13 +11,16 @@ import UIKit
 class ViewController: UIViewController, UITextViewDelegate {
 
     @IBOutlet var linkableText: LinkableUITextView!
+    @IBOutlet var enabledSwitch: UISwitch!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         
         linkableText.delegate = self
+        enabledSwitch.isOn = linkableText.enabled
     }
 
-
+    @IBAction func enableSwitchChanged(_ sender: UISwitch) {
+        linkableText.enabled = sender.isOn
+    }
 }
