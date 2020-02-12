@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITextViewDelegate {
+@IBDesignable class ViewController: UIViewController, UITextViewDelegate {
 
     @IBOutlet var linkableText: LinkableUITextView!
     @IBOutlet var enabledSwitch: UISwitch!
@@ -17,10 +17,10 @@ class ViewController: UIViewController, UITextViewDelegate {
         super.viewDidLoad()
         
         linkableText.delegate = self
-        enabledSwitch.isOn = linkableText.enabled
+        enabledSwitch.isOn = linkableText.enableHyperlinks
     }
 
     @IBAction func enableSwitchChanged(_ sender: UISwitch) {
-        linkableText.enabled = sender.isOn
+        linkableText.enableHyperlinks = sender.isOn
     }
 }

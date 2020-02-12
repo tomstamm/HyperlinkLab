@@ -26,6 +26,50 @@ class TextLink {
         }
     }
     
+    @IBInspectable var activeHyperlinkColor:UIColor = UIColor( named:"activeHyperLink" ) ?? UIColor.blue {
+        didSet {
+            activeHyperlinkAttributes = [
+                .foregroundColor:activeHyperlinkColor as Any,
+                .underlineStyle:1
+            ]
+            linkTextAttributes = activeHyperlinkAttributes
+            
+            for textLink in linkStore {
+                if enableHyperlinks {
+                     attributedString.setAttributes( baseAttributes, range:textLink.range )
+                     attributedString.addAttribute( .link, value:textLink.url, range:textLink.range )
+                } else {
+                    attributedString.setAttributes( inactiveHyperlinkAttributes, range:textLink.range )
+                }
+            }
+            
+            attributedText = attributedString
+
+        }
+    }
+    
+    @IBInspectable var inactiveHyperlinkColor:UIColor = UIColor( named:"inactiveHyperLink" ) ?? UIColor.darkGray {
+        didSet {
+            inactiveHyperlinkAttributes = [
+                .font:textFont as Any,
+                .foregroundColor:inactiveHyperlinkColor as Any,
+                .underlineStyle:1
+            ]
+            
+            for textLink in linkStore {
+                if enableHyperlinks {
+                     attributedString.setAttributes( baseAttributes, range:textLink.range )
+                     attributedString.addAttribute( .link, value:textLink.url, range:textLink.range )
+                } else {
+                    attributedString.setAttributes( inactiveHyperlinkAttributes, range:textLink.range )
+                }
+            }
+            
+            attributedText = attributedString
+
+        }
+    }
+
     var textFont = UIFont( name:"Helvetica Neue", size:12 ) ?? UIFont.systemFont(ofSize: 12 )
     @IBInspectable var fontName:String = "Helvetica Neue" {
         didSet {
@@ -40,20 +84,29 @@ class TextLink {
             makeLink()
         }
     }
-    
-    @IBInspectable var enabled:Bool = true {
+        
+    @IBInspectable var enableHyperlinks:Bool = true {
         didSet {
             for textLink in linkStore {
-                if enabled {
-                    attributedString.setAttributes( activeHyperlinkAttributes, range:textLink.range )
-                    attributedString.addAttribute( .link, value:textLink.url, range:textLink.range )
+                attributedString.removeAttribute( .font, range:textLink.range )
+                attributedString.removeAttribute( .foregroundColor, range:textLink.range )
+                attributedString.removeAttribute( .underlineStyle, range:textLink.range )
+                attributedString.removeAttribute( .link, range:textLink.range )
+                
+                activeHyperlinkAttributes = [
+                    .foregroundColor:activeHyperlinkColor as Any,
+                    .underlineStyle:1
+                ]
+                linkTextAttributes = activeHyperlinkAttributes
+
+                if enableHyperlinks {
+                     attributedString.setAttributes( baseAttributes, range:textLink.range )
+                     attributedString.addAttribute( .link, value:textLink.url, range:textLink.range )
                 } else {
                     attributedString.setAttributes( inactiveHyperlinkAttributes, range:textLink.range )
                 }
             }
-            text = ""
             attributedText = attributedString
-            print( "### \(linkableText) ###" )
         }
     }
 
@@ -63,24 +116,8 @@ class TextLink {
 
     override func prepareForInterfaceBuilder() {
         textFont = UIFont( name:fontName, size:fontSize ) ?? UIFont.systemFont(ofSize: fontSize)
-        
-        baseAttributes = [
-            .font:textFont as Any
-        ]
-        
-        activeHyperlinkAttributes = [
-            .font:textFont as Any,
-            .foregroundColor:UIColor(named:"activeHyperlink") as Any,
-            .underlineStyle:1
-        ]
-        
-        inactiveHyperlinkAttributes = [
-            .font:textFont as Any,
-            .foregroundColor:UIColor(named:"inactiveHyperlink") as Any,
-            .underlineStyle:1
-        ]
 
-        makeLink()
+//        makeLink()
     }
     
     
@@ -130,13 +167,14 @@ class TextLink {
         
         activeHyperlinkAttributes = [
             .font:textFont as Any,
-            .foregroundColor:UIColor(named:"activeHyperlink") as Any,
+            .foregroundColor:activeHyperlinkColor as Any,
             .underlineStyle:1
         ]
+        linkTextAttributes = activeHyperlinkAttributes
         
         inactiveHyperlinkAttributes = [
             .font:textFont as Any,
-            .foregroundColor:UIColor(named:"inactiveHyperlink") as Any,
+            .foregroundColor:inactiveHyperlinkColor as Any,
             .underlineStyle:1
         ]
 
@@ -242,8 +280,8 @@ class TextLink {
             print( "urlPart = \(urlPart)")
             attributedString.append( NSAttributedString( string:firstPart, attributes:baseAttributes ) )
         
-            var linkPart = NSMutableAttributedString( string:secondPart, attributes:activeHyperlinkAttributes )
-            if enabled {
+            var linkPart = NSMutableAttributedString( string:secondPart, attributes:baseAttributes )
+            if enableHyperlinks {
                 linkPart.addAttribute( .link, value:urlPart, range:NSRange( location:0, length:secondPart.count ) )
             } else {
                 linkPart = NSMutableAttributedString( string:secondPart, attributes:inactiveHyperlinkAttributes )
@@ -272,4 +310,77 @@ class TextLink {
         return returnString
     }
 
+    
+//    override open func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+//        guard textLink(at: point) != nil && isUserInteractionEnabled && !isHidden && alpha > 0 else {
+//            return super.hitTest(point, with: event)
+//        }
+//
+//        return self
+//    }
+//
+//    private var heightCorrectionOffset: CGFloat = 0
+//    private func textLink(at location: CGPoint) -> TextLink? {
+//        /// The hit test method by the voice over returns the point at the middle of the
+//        /// control breaking the functionallity because at the moment of the calculation
+//        /// of the position of the link returns nil, so if the user is running voice over
+//        /// we will return the first link in the stack, custom actions are supported
+//        /// for the remaining links
+////        guard !UIAccessibility.isVoiceOverRunning else {
+////            return textLinks.first
+////        }
+//
+//        let location = CGPoint(x: location.x, y: location.y - heightCorrectionOffset)
+//        let boundingRect = layoutManager.boundingRect(forGlyphRange: NSRange(location: 0, length: textStorage.length), in: textContainer)
+//
+//        guard boundingRect.contains(location) else { return nil }
+//
+//        let index = layoutManager.glyphIndex(for: location, in: textContainer)
+//        return linkStore.filter({ $0.range.location...$0.range.location + $0.range.length ~= index }).last
+//    }
+//
+//       @discardableResult
+//       private func handleTouch(_ touch: UITouch) -> Bool {
+//           switch touch.phase {
+//           case .began, .moved:
+////               let location = touch.location(in: self)
+////               let previousLink = activeLink
+////               activeLink = textLink(at: location)
+////
+////               if let textLink = activeLink {
+////                   textLink.state = .active
+////                   updateAttributes(for: textLink)
+////               }
+////
+////               if let link = previousLink, link != activeLink {
+////                   link.state = link.previousState ?? .normal
+////                   updateAttributes(for: link)
+////               }
+//
+//               return true
+//
+//           case .ended:
+////               guard let activeLink = activeLink else { return false }
+////
+////               activeLink.state = .visited
+////               updateAttributes(for: activeLink)
+////               didTapTextLink(activeLink)
+////               self.activeLink = nil
+//               return true
+//
+//           case .cancelled:
+////               guard let activeLink = activeLink else { return false }
+////
+////               activeLink.state = activeLink.previousState ?? .normal
+////               updateAttributes(for: activeLink)
+////               self.activeLink = nil
+//               return false
+//
+//           case .stationary: break
+//           @unknown default: break
+//           }
+//
+//           return false
+//       }
+    
 }

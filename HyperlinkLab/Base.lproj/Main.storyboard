@@ -21,15 +21,15 @@
                                     <action selector="enableSwitchChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="MLC-ly-TYs"/>
                                 </connections>
                             </switch>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TXe-1K-1wb" customClass="LinkableUITextView" customModule="HyperlinkLab" customModuleProvider="target">
-                                <rect key="frame" x="20" y="131" width="374" height="598"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TXe-1K-1wb" customClass="LinkableUITextView" customModule="HyperlinkLab" customModuleProvider="target">
+                                <rect key="frame" x="20" y="64" width="374" height="598"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="fontSize">
-                                        <real key="value" value="24"/>
+                                        <real key="value" value="18"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="string" keyPath="fontName" value="Helvetica Neue"/>
                                     <userDefinedRuntimeAttribute type="string" keyPath="linkableText">
@@ -40,6 +40,13 @@ Click &lt;a href='UIApplication.openSettingsURLString'&gt;here&lt;/a&gt; to deep
 &lt;a href='https://www.google.com'&gt;Google&lt;/a&gt;</string>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="enabled" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="enableHyperlinks" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="activeHyperlinkColor">
+                                        <color key="value" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="inactiveHyperlinkColor">
+                                        <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </textView>
                         </subviews>
